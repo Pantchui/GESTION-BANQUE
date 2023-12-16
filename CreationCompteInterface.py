@@ -11,7 +11,7 @@ class CreationCompteInterface(ctk.CTk):
         super().__init__()
 
         # configuration de la page
-        self.title("BANQUES")
+        self.title("BANQUES - Creation compte")
         self.geometry("620x620")
         self.resizable(False, False)
         self.iconbitmap(bitmap="./res/logo.ico")
@@ -53,17 +53,17 @@ class CreationCompteInterface(ctk.CTk):
 
         # mot de passe
         self.mdp1 = ctk.CTkEntry(self.frame, placeholder_text="Votre mot de passe", width=250, height=35,
-                                  font=config.font_button)
+                                 font=config.font_button)
         self.mdp1.grid(row=4, column=0, columnspan=2, pady=20, padx=20)
 
         # numero de telephone
         self.mdp2 = ctk.CTkEntry(self.frame, placeholder_text="Confirmation du mot de passe", width=250, height=35,
-                                       font=config.font_button)
+                                 font=config.font_button)
         self.mdp2.grid(row=4, column=2, columnspan=4, pady=20, padx=20)
 
         # separation section
         self.label1 = ctk.CTkLabel(self.frame, text="Informations sur la residence",
-                                  font=config.font_petit, text_color=config.titre_color)
+                                   font=config.font_petit, text_color=config.titre_color)
         self.label1.grid(row=5, column=0, pady=(20, 20))
 
         # pays
@@ -73,22 +73,22 @@ class CreationCompteInterface(ctk.CTk):
 
         # ville
         self.ville = ctk.CTkEntry(self.frame, placeholder_text="Votre ville", width=250, height=35,
-                                 font=config.font_button)
+                                  font=config.font_button)
         self.ville.grid(row=6, column=2, columnspan=4, pady=20, padx=20)
 
         # pays
         self.quartier = ctk.CTkEntry(self.frame, placeholder_text="Votre quartier", width=250, height=35,
-                                 font=config.font_button)
+                                     font=config.font_button)
         self.quartier.grid(row=7, column=0, columnspan=2, pady=20, padx=20)
 
         # residence
         self.residence = ctk.CTkEntry(self.frame, placeholder_text="Votre residence", width=250, height=35,
-                                 font=config.font_button)
+                                      font=config.font_button)
         self.residence.grid(row=7, column=2, columnspan=4, pady=20, padx=20)
 
         # separation section
         self.label2 = ctk.CTkLabel(self.frame, text="Autres informations sur le compte", font=config.font_petit,
-                                  text_color=config.titre_color)
+                                   text_color=config.titre_color)
         self.label2.grid(row=8, column=0, pady=(20, 20))
 
         # proffesion
@@ -97,7 +97,7 @@ class CreationCompteInterface(ctk.CTk):
 
         # entry proffession
         self.proffesion = ctk.CTkEntry(self.frame, width=250, height=35,
-                                      font=config.font_button)
+                                       font=config.font_button)
         self.proffesion.grid(row=9, column=2, columnspan=4, pady=20, sticky="nw", padx=(10, 0))
 
         # proffesion
@@ -106,18 +106,16 @@ class CreationCompteInterface(ctk.CTk):
 
         # entry proffession
         self.proffesion = ctk.CTkComboBox(self.frame, width=250, height=35,
-                                       font=config.font_button, values=["Courant", "Epargne"], button_color=config.titre_color,
-                                          button_hover_color=config.titre_color, dropdown_hover_color=config.hover_color_button,
-                                          border_color=config.titre_color)
+                                          font=config.font_button, values=["Courant", "Epargne"],
+                                          button_color=config.titre_color,
+                                          button_hover_color=config.titre_color,
+                                          dropdown_hover_color=config.titre_color,
+                                          border_color=config.titre_color, dropdown_fg_color="white",
+                                          dropdown_text_color="black")
         self.proffesion.grid(row=10, column=2, columnspan=4, pady=(20, 50), sticky="nw", padx=(10, 0))
 
         # button
         self.creation_compte = ctk.CTkButton(self.frame, text="Creer mon compte", hover=False,
-                                             fg_color=config.titre_color, corner_radius=8, font=config.font_button, text_color="black")
+                                             fg_color=config.titre_color, corner_radius=8, font=config.font_button,
+                                             text_color="black")
         self.creation_compte.grid(row=11, column=3, pady=(0, 20), ipady=5)
-
-
-
-
-app = CreationCompteInterface()
-app.mainloop()

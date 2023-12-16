@@ -4,7 +4,11 @@ import tkinter as tk
 from PIL import Image, ImageTk
 
 # importation des classes
-# from CreationCompteInterface import CreationCompteInterface
+from CreationCompteInterface import CreationCompteInterface
+from DepotInterface import DepotInterface
+from RetraitInterface import RetraitInterface
+from VirementInterface import VirementInterface
+
 import Configuration as config
 
 ctk.set_appearance_mode("System")
@@ -47,7 +51,7 @@ class Main(ctk.CTk):
         self.depot_image_tk = ctk.CTkImage(dark_image=self.depot_image)
         self.button_depot = ctk.CTkButton(self.frame, fg_color="transparent", bg_color="transparent",
                                           text="Effectuer un depot", font=config.font_button, image=self.depot_image_tk,
-                                          hover_color=config.hover_color_button)
+                                          hover_color=config.hover_color_button, command=self.effectuer_depot)
         self.button_depot.pack(pady=(0, 30), ipady=5)
 
         # effectuer un retrait
@@ -55,7 +59,8 @@ class Main(ctk.CTk):
         self.retrait_image_tk = ctk.CTkImage(self.retrait_image)
         self.button_retrait = ctk.CTkButton(self.frame, fg_color="transparent", bg_color="transparent",
                                             text="Effectuer un retrait", font=config.font_button,
-                                            image=self.retrait_image_tk, hover_color=config.hover_color_button)
+                                            image=self.retrait_image_tk, command=self.effectuer_retrait,
+                                            hover_color=config.hover_color_button)
         self.button_retrait.pack(pady=(0, 30), ipady=5)
 
         # effectuer un virement
@@ -63,7 +68,8 @@ class Main(ctk.CTk):
         self.virement_image_tk = ctk.CTkImage(self.virement_image)
         self.button_virement = ctk.CTkButton(self.frame, fg_color="transparent", bg_color="transparent",
                                              text="Effectuer un virement", font=config.font_button,
-                                             image=self.virement_image_tk, hover_color=config.hover_color_button)
+                                             image=self.virement_image_tk, hover_color=config.hover_color_button,
+                                             command=self.effectuer_virement)
         self.button_virement.pack(pady=(0, 30), ipady=5)
 
         # effectuer un virement
@@ -74,9 +80,28 @@ class Main(ctk.CTk):
                                                image=self.historique_image_tk, hover_color=config.hover_color_button)
         self.button_historique.pack(pady=(0, 30), ipady=5)
 
-
+    # fonction de creation compte
     def creation_compte(self):
-        pass
+        self.destroy()
+        creation_compte = CreationCompteInterface()
+        creation_compte.mainloop()
+
+    # fonction de depot
+    def effectuer_depot(self):
+        self.destroy()
+        effectuer_depot = DepotInterface()
+        effectuer_depot.mainloop()
+
+    # fonction de retrait
+    def effectuer_retrait(self):
+        self.destroy()
+        effectuer_retrait = RetraitInterface()
+        effectuer_retrait.mainloop()
+
+    def effectuer_virement(self):
+        self.destroy()
+        effectuer_virement = VirementInterface()
+        effectuer_virement.mainloop()
 
 
 if __name__ == "__main__":
