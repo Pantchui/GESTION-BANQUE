@@ -3,6 +3,7 @@ import tkinter as tk
 
 # importations des classes
 import Configuration as config
+from CreationCompte import CreationCompte
 
 
 class CreationCompteInterface(ctk.CTk):
@@ -37,9 +38,9 @@ class CreationCompteInterface(ctk.CTk):
         self.nom_utilisateur.grid(row=2, column=0, columnspan=2, pady=20, padx=20)
 
         # prenom
-        self.nom_utilisateur = ctk.CTkEntry(self.frame, placeholder_text="Votre prenom", width=250, height=35,
-                                            font=config.font_button)
-        self.nom_utilisateur.grid(row=2, column=2, columnspan=4, pady=20, padx=20)
+        self.prenom_utilisateur = ctk.CTkEntry(self.frame, placeholder_text="Votre prenom", width=250, height=35,
+                                               font=config.font_button)
+        self.prenom_utilisateur.grid(row=2, column=2, columnspan=4, pady=20, padx=20)
 
         # adresse mail
         self.email = ctk.CTkEntry(self.frame, placeholder_text="Votre adresse mail", width=250, height=35,
@@ -53,12 +54,12 @@ class CreationCompteInterface(ctk.CTk):
 
         # mot de passe
         self.mdp1 = ctk.CTkEntry(self.frame, placeholder_text="Votre mot de passe", width=250, height=35,
-                                 font=config.font_button)
+                                 font=config.font_button, show="*")
         self.mdp1.grid(row=4, column=0, columnspan=2, pady=20, padx=20)
 
-        # numero de telephone
+        # confirmation mot de passe
         self.mdp2 = ctk.CTkEntry(self.frame, placeholder_text="Confirmation du mot de passe", width=250, height=35,
-                                 font=config.font_button)
+                                 font=config.font_button, show="*")
         self.mdp2.grid(row=4, column=2, columnspan=4, pady=20, padx=20)
 
         # separation section
@@ -100,22 +101,42 @@ class CreationCompteInterface(ctk.CTk):
                                        font=config.font_button)
         self.proffesion.grid(row=9, column=2, columnspan=4, pady=20, sticky="nw", padx=(10, 0))
 
-        # proffesion
+        # type de commpte
         self.label3 = ctk.CTkLabel(self.frame, text="Type de compte: ", font=config.font_button)
-        self.label3.grid(row=10, column=0, columnspan=2, sticky="se", pady=(20, 50), padx=(0, 10))
+        self.label3.grid(row=10, column=0, columnspan=2, sticky="se", pady=20, padx=(0, 10))
 
-        # entry proffession
-        self.proffesion = ctk.CTkComboBox(self.frame, width=250, height=35,
-                                          font=config.font_button, values=["Courant", "Epargne"],
-                                          button_color=config.titre_color,
-                                          button_hover_color=config.titre_color,
-                                          dropdown_hover_color=config.titre_color,
-                                          border_color=config.titre_color, dropdown_fg_color="white",
-                                          dropdown_text_color="black")
-        self.proffesion.grid(row=10, column=2, columnspan=4, pady=(20, 50), sticky="nw", padx=(10, 0))
+        # entry type_compte
+        self.type_compte = ctk.CTkComboBox(self.frame, width=250, height=35,
+                                           font=config.font_button, values=["Courant", "Epargne"],
+                                           button_color=config.titre_color,
+                                           button_hover_color=config.titre_color,
+                                           dropdown_hover_color=config.titre_color,
+                                           border_color=config.titre_color, dropdown_fg_color="white",
+                                           dropdown_text_color="black")
+        self.type_compte.grid(row=10, column=2, columnspan=4, pady=20, sticky="nw", padx=(10, 0))
+
+        # montant initiale
+        self.label4 = ctk.CTkLabel(self.frame, text="Montant initial", font=config.font_button)
+        self.label4.grid(row=11, column=0, columnspan=2, sticky="se", pady=(20, 50), padx=(0, 10))
+
+        # entry montant initiale
+        self.solde_intiale = ctk.CTkEntry(self.frame, width=250, height=35,
+                                          font=config.font_button)
+        self.solde_intiale.grid(row=11, column=2, columnspan=4, pady=(20, 50), sticky="nw", padx=(10, 0))
 
         # button
         self.creation_compte = ctk.CTkButton(self.frame, text="Creer mon compte", hover=False,
                                              fg_color=config.titre_color, corner_radius=8, font=config.font_button,
-                                             text_color="black")
-        self.creation_compte.grid(row=11, column=3, pady=(0, 20), ipady=5)
+                                             text_color="black", command=self.creation_compte)
+        self.creation_compte.grid(row=12, column=3, pady=(0, 20), ipady=5)
+
+    # creation de compte
+    def creation_compte(self):
+        creation_compte = CreationCompte(self.nom_utilisateur.get(), self.prenom_utilisateur.get(), self.email.get(),
+                                         self.numero_tel.get(), self.mdp1.get(), self.mdp2.get(), self.pays.get(),
+                                         self.ville.get(), self.quartier.get(), self.residence.get(),
+                                         self.proffesion.get(), self.type_compte.get(), self.solde_intiale.get())
+        result = creation_compte.verification()
+        if result == 1:
+            self.destroy()
+            creation_compte.insertion()
