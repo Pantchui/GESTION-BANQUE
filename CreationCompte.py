@@ -1,5 +1,4 @@
 import pymysql
-from CTkMessagebox import CTkMessagebox
 from random import randint
 from datetime import datetime
 
@@ -9,9 +8,10 @@ import ConnexionBDD as bd
 
 
 class CreationCompte:
-    def __init__(self, nom_utilisateur, prenom_utilisateur, email, numero_tel, mdp1, mdp2, pays, ville, quartier,
-                 residence, proffesion, type_compte, solde_intiale):
+    def __init__(self, interface, nom_utilisateur, prenom_utilisateur, email, numero_tel, mdp1, mdp2, pays, ville,
+                 quartier, residence, proffesion, type_compte, solde_intiale):
 
+        self.interface = interface
         self.nom_utilisateur = nom_utilisateur
         self.prenom_utilisateur = prenom_utilisateur
         self.email = email
@@ -38,66 +38,65 @@ class CreationCompte:
                 # verification des mots de passe
                 if self.mdp1 == self.mdp2:
 
-                    # verification du solde intitiale
-                    try:
-                        self.solde_intiale = float(self.solde_intiale)
-                    except ValueError:
-                        CTkMessagebox(title="Attention", message="Les solde initial n'est pas valide",
-                                      icon="warning", button_color=config.titre_color, button_text_color="black",
-                                      text_color="white", button_hover_color=config.titre_color, icon_size=(32, 32))
+                    # verification longeurs du mot de passe
+                    if len(self.mdp1) >= 8:
+                        # verification du solde intitiale
+                        try:
+                            self.solde_intiale = float(self.solde_intiale)
+                        except ValueError:
+                            config.msg("Attention", "Les solde initial n'est pas valide", "warning")
+                            return 0
+
+                        # si aucune exception n'est declanche
+                        else:
+                            return 1
+                    else:
+                        config.msg("Attention", "Les mots doivent avoir au moins 8 caracteres!", "warning")
                         return 0
 
-                    # si aucune exception n'est declanche
-                    else:
-                        return 1
-
                 else:
-                    CTkMessagebox(title="Attention", message="Les mots de passe ne correspondent pas!",
-                                  icon="warning", button_color=config.titre_color, button_text_color="black",
-                                  text_color="white", button_hover_color=config.titre_color, icon_size=(32, 32))
+                    config.msg("Attention", "Les mots de passe ne correspondent pas!", "warning")
                     return 0
             else:
-                CTkMessagebox(title="Attention", message="L'adresse mail n'est pas correct!",
-                              icon="warning", button_color=config.titre_color, button_text_color="black",
-                              text_color="white", button_hover_color=config.titre_color, icon_size=(32, 32))
+                config.msg("Attention", "L'adresse mail n'est pas correct!", "warning")
                 return 0
         else:
-            CTkMessagebox(title="Attention", message="Veuillez completer tous les champs",
-                          icon="warning", button_color=config.titre_color, button_text_color="black",
-                          text_color="white", button_hover_color=config.titre_color, icon_size=(32, 32))
+            config.msg("Attention", "Veuillez completer tous les champs", "warning")
             return 0
 
-    def insertion(self):
+    def creation(self):
 
         # generation automatiques de code
-        code = (str(randint(1000000000000, 9999999999999)) + "." + str(datetime.now().year) + "." +
-                str(randint(100000000000000, 99999999999999999)) + "_BANQUES" + "." + str(randint(10000, 99999)))
+        code = str(randint(1000000000000000000000000, 9999999999999999999999999))
         # sql
-        sql = ("INSERT INTO compte(code_compte, type_compte, nom, prenom, email, num_tel, mdp, pays, "
-               "ville, quartier, residence, proffesion, date_creation, solde_initial, solde) "
-               "VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+        sql1 = ("INSERT INTO compte(code_compte, type_compte, nom, prenom, email, num_tel, mdp, pays, "
+                "ville, quartier, residence, proffesion, date_creation, solde_initial, solde) "
+                "VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)")
+        sql2 = "INSERT INTO transactions VALUES(%s, %s, %s, %s, %s)"
 
         try:
-            bd.donnees_fetche.execute(sql, (code, self.type_compte, self.nom_utilisateur, self.prenom_utilisateur,
-                                            self.email, self.numero_tel, self.mdp1, self.pays, self.ville,
-                                            self.quartier, self.residence, self.proffession,
-                                            datetime.now(), self.solde_intiale, self.solde_intiale))
+            if self.type_compte == "Courant":
+                solde = self.solde_intiale
+            else:
+                solde = (self.solde_intiale * 5) / 100 + self.solde_intiale
+
+            # debut de la transaction
+            bd.bd_connexion.begin()
+
+            bd.donnees_fetche.execute(sql1, (code, self.type_compte, self.nom_utilisateur, self.prenom_utilisateur,
+                                             self.email, self.numero_tel, self.mdp1, self.pays, self.ville,
+                                             self.quartier, self.residence, self.proffession,
+                                             datetime.now(), self.solde_intiale, solde))
+
+            bd.donnees_fetche.execute(sql2, (config.numero(), code, datetime.now(), "D",
+                                             "Solde initiale. Ouverture du compte"))
             # valider la transaction
             bd.bd_connexion.commit()
         except pymysql.Error:
-            CTkMessagebox(title="Erreur", message="Nous avons rencontré un probleme lors de la création du compte\n"
-                                                  "Merci de ressayer!", icon="cancel", button_color=config.titre_color,
-                          button_text_color="black", text_color="white",
-                          button_hover_color=config.titre_color, icon_size=(32, 32))
+            config.msg("Erreur", "Nous avons rencontré un probleme lors de la création du compte\n"
+                                 "Merci de ressayer!", "cancel")
         else:
-            CTkMessagebox(title="Succes", message="Votre compte a bien été créé!", icon="cancel",
-                          button_color=config.titre_color, button_text_color="black", text_color="white",
-                          button_hover_color=config.titre_color, icon_size=(32, 32))
+            config.msg("Terminé", "Votre compte a bien été créé!", "check")
 
-            # import de la classe menu
-            from Main import Main
-            app = Main()
-            app.mainloop()
-        finally:
-            bd.donnees_fetche.close()
-            bd.bd_connexion.close()
+            # import de la classe main
+            self.interface.deiconify()

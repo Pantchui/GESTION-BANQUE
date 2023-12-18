@@ -8,6 +8,7 @@ from CreationCompteInterface import CreationCompteInterface
 from DepotInterface import DepotInterface
 from RetraitInterface import RetraitInterface
 from VirementInterface import VirementInterface
+from GenerationCode import GenerationCode
 
 import Configuration as config
 
@@ -72,38 +73,97 @@ class Main(ctk.CTk):
                                              command=self.effectuer_virement)
         self.button_virement.pack(pady=(0, 30), ipady=5)
 
-        # effectuer un virement
+        # consultation virement
         self.historique_image = Image.open("./res/historiques.png")
         self.historique_image_tk = ctk.CTkImage(self.historique_image)
         self.button_historique = ctk.CTkButton(self.frame, fg_color="transparent", bg_color="transparent",
                                                text="Consulter l'historique", font=config.font_button,
-                                               image=self.historique_image_tk, hover_color=config.hover_color_button)
+                                               image=self.historique_image_tk, hover_color=config.hover_color_button,
+                                               command=self.historiques)
         self.button_historique.pack(pady=(0, 30), ipady=5)
 
     # fonction de creation compte
     def creation_compte(self):
-        self.destroy()
-        creation_compte = CreationCompteInterface()
+        self.withdraw()
+        creation_compte = CreationCompteInterface(self)
         creation_compte.mainloop()
 
     # fonction de depot
     def effectuer_depot(self):
-        self.destroy()
-        effectuer_depot = DepotInterface()
+        self.withdraw()
+        effectuer_depot = DepotInterface(self)
         effectuer_depot.mainloop()
 
     # fonction de retrait
     def effectuer_retrait(self):
-        self.destroy()
-        effectuer_retrait = RetraitInterface()
+        self.withdraw()
+        effectuer_retrait = RetraitInterface(self)
         effectuer_retrait.mainloop()
 
     def effectuer_virement(self):
-        self.destroy()
-        effectuer_virement = VirementInterface()
+        self.withdraw()
+        effectuer_virement = VirementInterface(self)
         effectuer_virement.mainloop()
 
+    # fonction historiques
+    def historiques(self):
 
-if __name__ == "__main__":
-    app = Main()
-    app.mainloop()
+        def close_toplevel():
+            toplevel.destroy()
+            self.deiconify()
+
+        def code_generation():
+            # fenetre de generation
+            dialog = ctk.CTkInputDialog(text="Entrer votre numero de telephone", button_hover_color=config.titre_color,
+                                        button_fg_color=config.titre_color, button_text_color="black",
+                                        title="Generation de numero", font=config.font_button)
+
+            generation_numero = GenerationCode(dialog.get_input())
+            results = generation_numero.generation_code()
+
+            if not len(results) == 0:
+                if len(results) == 1:
+                    code_compte.insert(0, results[0])
+                else:
+                    numero = ""
+                    for result in results:
+                        numero = numero + str(result[0]) + "\n\n"
+                    config.msg("Information", f"Voici vos numeros de compte:\n{numero}\nEntrer le numero du "
+                                              f"compte que vous souhaitez faire le depot", "check")
+            else:
+                config.msg("Erreur", "Desole le numero est incorrect!", "cancel")
+
+        def afficher_historiques():
+            pass
+
+        self.withdraw()
+        toplevel = ctk.CTkToplevel(self)
+        toplevel.iconbitmap(bitmap="./res/logo.ico")
+        toplevel.title("Affichage historique")
+
+        ctk.CTkLabel(toplevel, text="Informations du compte", font=config.font_label,
+                     text_color=config.titre_color).pack(pady=20, padx=20)
+
+        # champ
+        code_compte = ctk.CTkEntry(toplevel, placeholder_text="Code du compte", height=35,
+                                   font=config.font_button, width=400)
+        code_compte.pack(padx=20, pady=20, fill=tk.BOTH)
+
+        mdp_compte = ctk.CTkEntry(toplevel, placeholder_text="Mot de passe du compte", height=35,
+                                  font=config.font_button, width=400)
+        mdp_compte.pack(padx=20, pady=20, fill=tk.BOTH)
+
+        # buttons
+        btn1 = ctk.CTkButton(toplevel, text="Generez mon numero", font=config.font_button,
+                             text_color=config.titre_color, hover=False, fg_color="transparent",
+                             command=code_generation)
+        btn1.pack(padx=20, pady=20, side=tk.LEFT)
+
+        btn2 = ctk.CTkButton(toplevel, text="Mon historique", font=config.font_button,
+                             text_color="black", hover=False, fg_color=config.titre_color,
+                             command=afficher_historiques)
+        btn2.pack(padx=20, pady=20, side=tk.RIGHT)
+
+        toplevel.protocol("WM_DELETE_WINDOW", close_toplevel)
+
+

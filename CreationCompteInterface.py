@@ -8,8 +8,9 @@ from CreationCompte import CreationCompte
 
 class CreationCompteInterface(ctk.CTk):
 
-    def __init__(self):
+    def __init__(self, interface):
         super().__init__()
+        self.interface = interface
 
         # configuration de la page
         self.title("BANQUES - Creation compte")
@@ -130,13 +131,21 @@ class CreationCompteInterface(ctk.CTk):
                                              text_color="black", command=self.creation_compte)
         self.creation_compte.grid(row=12, column=3, pady=(0, 20), ipady=5)
 
+        # fermeture
+        self.protocol("WM_DELETE_WINDOW", self.close_root)
+
     # creation de compte
     def creation_compte(self):
-        creation_compte = CreationCompte(self.nom_utilisateur.get(), self.prenom_utilisateur.get(), self.email.get(),
+        creation_compte = CreationCompte(self.interface, self.nom_utilisateur.get(), self.prenom_utilisateur.get(),
+                                         self.email.get(),
                                          self.numero_tel.get(), self.mdp1.get(), self.mdp2.get(), self.pays.get(),
                                          self.ville.get(), self.quartier.get(), self.residence.get(),
                                          self.proffesion.get(), self.type_compte.get(), self.solde_intiale.get())
         result = creation_compte.verification()
         if result == 1:
             self.destroy()
-            creation_compte.insertion()
+            creation_compte.creation()
+
+    def close_root(self):
+        self.destroy()
+        self.interface.deiconify()

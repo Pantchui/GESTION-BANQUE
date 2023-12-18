@@ -13,7 +13,7 @@ try:
 
     donnees_fetche = bd_connexion.cursor()
 
-except:
+except pymysql.Error:
     CTkMessagebox(title="Erreur", message="Nous avons rencontré un problème lors de la connexion à la base de données",
                   icon="cancel", button_color=config.titre_color, button_text_color="black",
                   text_color="white", button_hover_color=config.titre_color, icon_size=(32, 32))
