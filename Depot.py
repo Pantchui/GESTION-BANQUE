@@ -59,7 +59,7 @@ class Depot:
 
                         # enregistrement de la transaction
                         bd.donnees_fetche.execute(sql2, (config.numero(), self.code_compte_depot,
-                                                         datetime.now(), "R", self.motif_depot))
+                                                         datetime.now(), "D", self.motif_depot))
                         # validation des transactions
                         bd.bd_connexion.commit()
                     except pymysql.Error:

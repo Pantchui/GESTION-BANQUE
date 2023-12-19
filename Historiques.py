@@ -25,5 +25,30 @@ class Historiques:
             if result[0] > 0:
                 return True
             else:
-                config.msg("Information", "Le mot de passe est incorrect!", "check")
+                config.msg("Attention", "Le mot de passe est incorrect!\n"
+                                        "Merci de reessayer!", "warning")
                 return False
+
+    def affichages_transaction(self):
+        sql = "SELECT * FROM transactions WHERE code_compte = %s ORDER BY date_transaction DESC"
+        try:
+            bd.donnees_fetche.execute(sql, (self.code_compte, ))
+            results = bd.donnees_fetche.fetchall()
+        except pymysql.Error:
+            config.msg("Erreur", "Nous avons rencontré un probleme de la transaction\n"
+                                 "Merci de ressayer!", "cancel")
+            return False
+        else:
+            return results
+
+    def affichages_information(self):
+        sql = "SELECT * FROM compte WHERE code_compte = %s"
+        try:
+            bd.donnees_fetche.execute(sql, (self.code_compte,))
+            results = bd.donnees_fetche.fetchone()
+        except pymysql.Error:
+            config.msg("Erreur", "Nous avons rencontré un probleme de la transaction\n"
+                                 "Merci de ressayer!", "cancel")
+            return False
+        else:
+            return results

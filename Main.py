@@ -3,12 +3,16 @@ import tkinter as tk
 
 from PIL import Image, ImageTk
 
+
 # importation des classes
 from CreationCompteInterface import CreationCompteInterface
 from DepotInterface import DepotInterface
+from Historiques import Historiques
 from RetraitInterface import RetraitInterface
 from VirementInterface import VirementInterface
 from GenerationCode import GenerationCode
+from HistoriquesInterface import HistoriquesInterface
+from InformationsInterface import InformationsInterface
 
 import Configuration as config
 
@@ -23,8 +27,8 @@ class Main(ctk.CTk):
 
         # configuration de la page
         self.title("BANQUES")
-        self.geometry("500x500")
-        # self.resizable(False, False)
+        self.geometry("500x570")
+        self.resizable(False, False)
         self.iconbitmap(bitmap="./res/logo.ico")
 
         # ajout element
@@ -36,7 +40,7 @@ class Main(ctk.CTk):
         self.image_titre_tk = ImageTk.PhotoImage(self.image_titre.resize((70, 70)))
         self.titre = ctk.CTkLabel(self.frame, text="BANQUES", font=config.font_titre, text_color=config.titre_color,
                                   image=self.image_titre_tk, compound=tk.LEFT)
-        self.titre.pack(pady=(20, 50))
+        self.titre.pack(pady=(20, 40))
 
         # creation compte
         self.creation_image = Image.open("./res/plus.png")
@@ -73,14 +77,27 @@ class Main(ctk.CTk):
                                              command=self.effectuer_virement)
         self.button_virement.pack(pady=(0, 30), ipady=5)
 
-        # consultation virement
+        # consultation historique
         self.historique_image = Image.open("./res/historiques.png")
         self.historique_image_tk = ctk.CTkImage(self.historique_image)
         self.button_historique = ctk.CTkButton(self.frame, fg_color="transparent", bg_color="transparent",
                                                text="Consulter l'historique", font=config.font_button,
                                                image=self.historique_image_tk, hover_color=config.hover_color_button,
-                                               command=self.historiques)
+                                               command=lambda: self.verifications_informations("historique",
+                                                                                               Historiques,
+                                                                                               HistoriquesInterface))
         self.button_historique.pack(pady=(0, 30), ipady=5)
+
+        # info compte
+        self.historique_image = Image.open("./res/info.png")
+        self.historique_image_tk = ctk.CTkImage(self.historique_image)
+        self.button_historique = ctk.CTkButton(self.frame, fg_color="transparent", bg_color="transparent",
+                                               text="Informations du compte", font=config.font_button,
+                                               image=self.historique_image_tk, hover_color=config.hover_color_button,
+                                               command=lambda: self.verifications_informations("information",
+                                                                                               Historiques,
+                                                                                               InformationsInterface))
+        self.button_historique.pack(pady=(0, 10), ipady=5)
 
     # fonction de creation compte
     def creation_compte(self):
@@ -106,7 +123,7 @@ class Main(ctk.CTk):
         effectuer_virement.mainloop()
 
     # fonction historiques
-    def historiques(self):
+    def verifications_informations(self, type_appelation, __class__, __class__interface__):
 
         def close_toplevel():
             toplevel.destroy()
@@ -129,12 +146,40 @@ class Main(ctk.CTk):
                     for result in results:
                         numero = numero + str(result[0]) + "\n\n"
                     config.msg("Information", f"Voici vos numeros de compte:\n{numero}\nEntrer le numero du "
-                                              f"compte que vous souhaitez faire le depot", "check")
+                                              f"compte que vous souhaitez voir les historiques de transactions",
+                               "check")
             else:
                 config.msg("Erreur", "Desole le numero est incorrect!", "cancel")
 
         def afficher_historiques():
-            pass
+            infos = __class__(self, code_compte.get(), mdp_compte.get())
+            if infos.verification():
+                affichage = False
+
+                # si la methode est appele pour consulter l'historique
+                if type_appelation == "historique":
+                    results = infos.affichages_transaction()
+                    if len(results) > 0:
+                        affichage = True
+                        toplevel.destroy()
+                        infos_interface = __class__interface__(self, results[0][1], results)
+                        infos_interface.mainloop()
+
+                # si la methode est appele pour consulter les informations
+                else:
+                    results = infos.affichages_information()
+                    if len(results) > 0:
+                        affichage = True
+                        toplevel.destroy()
+                        infos_interface = __class__interface__(interface=self, resultats=results)
+                        infos_interface.mainloop()
+
+                # dans le cas ou on ne trouve pas d'informations
+                if not affichage:
+                    config.msg("Information", f"Aucune transaction pour se compte \n"
+                                              f"(Numero: {code_compte.get()})", "check")
+                    toplevel.destroy()
+                    self.deiconify()
 
         self.withdraw()
         toplevel = ctk.CTkToplevel(self)
@@ -150,7 +195,7 @@ class Main(ctk.CTk):
         code_compte.pack(padx=20, pady=20, fill=tk.BOTH)
 
         mdp_compte = ctk.CTkEntry(toplevel, placeholder_text="Mot de passe du compte", height=35,
-                                  font=config.font_button, width=400)
+                                  font=config.font_button, width=400, show="*")
         mdp_compte.pack(padx=20, pady=20, fill=tk.BOTH)
 
         # buttons
@@ -165,5 +210,3 @@ class Main(ctk.CTk):
         btn2.pack(padx=20, pady=20, side=tk.RIGHT)
 
         toplevel.protocol("WM_DELETE_WINDOW", close_toplevel)
-
-
